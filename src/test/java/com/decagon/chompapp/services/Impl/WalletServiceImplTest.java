@@ -166,6 +166,7 @@ class WalletServiceImplTest {
         when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(user));
         when(walletRepository.findWalletByUser_Email(user.getEmail())).thenReturn(wallet);
 
+
         ResponseEntity<String> wallet1 = walletService.checkWalletBalance();
 
         assertThat(wallet1.getStatusCodeValue()).isEqualTo(200);

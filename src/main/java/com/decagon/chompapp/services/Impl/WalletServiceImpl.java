@@ -100,7 +100,7 @@ public class WalletServiceImpl implements WalletService {
 
         Optional<Wallet> wallet = Optional.ofNullable(walletRepository.findWalletByUser_Email(user.get().getEmail()));
         Wallet wallet1 = null;
-        if (wallet != null){
+        if (wallet.isPresent()){
             wallet1 = user.get().getWallet();
         }
         return ResponseEntity.status(HttpStatus.OK).body("Wallet balance is : " + wallet1.getWalletBalance());
