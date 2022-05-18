@@ -140,8 +140,37 @@ class WalletServiceImplTest {
         assertThat(wallet1.getStatusCodeValue()).isEqualTo(200);
         assertThat(wallet.getWalletBalance()).isNotNull();
         Assertions.assertThat(wallet.getWalletBalance()).isEqualTo(1000.0);
+    }
 
+    @Test
+    void testWalletBalance() {
+        user = User.builder()
+                .userId(1L)
+                .email("adekunle@gmail.com")
+                .password("12345")
+                .username("kay")
+                .firstName("James")
+                .build();
 
+        WalletTransactionRequest walletTransactionRequest = new WalletTransactionRequest();
+        Wallet wallet = new Wallet();
+        wallet.setWalletBalance(3000.0);
+
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), List.of(new SimpleGrantedAuthority("PREMIUM")));
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        Mockito.when(authentication.getName()).thenReturn(userDetails.getUsername());
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(user));
+        when(walletRepository.findWalletByUser_Email(user.getEmail())).thenReturn(wallet);
+
+        ResponseEntity<String> wallet1 = walletService.checkWalletBalance();
+
+        assertThat(wallet1.getStatusCodeValue()).isEqualTo(200);
+        assertThat(wallet.getWalletBalance()).isNotNull();
+        Assertions.assertThat(wallet.getWalletBalance()).isEqualTo(3000.0);
     }
 
 }
