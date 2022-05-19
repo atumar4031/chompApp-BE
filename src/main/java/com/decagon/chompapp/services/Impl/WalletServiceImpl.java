@@ -97,13 +97,13 @@ public class WalletServiceImpl implements WalletService {
     public ResponseEntity<String> checkWalletBalance() {
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByEmail(userEmail);
-
         Optional<Wallet> wallet = Optional.ofNullable(walletRepository.findWalletByUser_Email(user.get().getEmail()));
-        Wallet wallet1 = null;
         if (wallet.isPresent()){
-            wallet1 = user.get().getWallet();
+            Wallet wallet1 = wallet.get();
+            return ResponseEntity.status(HttpStatus.OK).body("Wallet balance is : " + wallet1.getWalletBalance());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Wallet balance is : " + wallet1.getWalletBalance());
+//        return ResponseEntity.notFound(HttpStatus.NOT_FOUND);
+        return null;
     }
 
 }
