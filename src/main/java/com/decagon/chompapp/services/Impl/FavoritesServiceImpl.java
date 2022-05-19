@@ -1,7 +1,6 @@
 package com.decagon.chompapp.services.Impl;
 
-import com.decagon.chompapp.exceptions.NoFavoriteException;
-import com.decagon.chompapp.exceptions.ProductNotFoundException;
+import com.decagon.chompapp.exceptions.ResourceNotFoundException;
 import com.decagon.chompapp.exceptions.UserNotFoundException;
 import com.decagon.chompapp.models.Favorites;
 import com.decagon.chompapp.models.Product;
@@ -38,23 +37,23 @@ public class FavoritesServiceImpl implements FavoritesService {
                 .orElseThrow(()-> new UserNotFoundException("User with this id does not exist. " +
                         "Please check and try again."));
         Product favoriteProduct = productRepository.findById(productId)
-                .orElseThrow(()-> new ProductNotFoundException("This product", "id", productId));
+                .orElseThrow(()-> new ResourceNotFoundException("Product with this Id does not exit!"));
 
-        Boolean favorites = favoriteRepository.existsByUserIdAndFavoriteProductId(user.getUserId(), productId);
+        Boolean favorites = favoriteRepository.existsByUserAndProduct(user, favoriteProduct);
 
         if (!favorites){
             Favorites fav = new Favorites();
-            fav.setUserId(user.getUserId());
-            fav.setFavoriteProductId(favoriteProduct.getProductId());
-            Favorites favorites1 = favoriteRepository.save(fav);
-            return new ResponseEntity<>(favorites1.getFavoriteId()+ " added to favorite", HttpStatus.OK);
+            fav.setUser(user);
+            fav.setProduct(favoriteProduct);
+            favoriteRepository.save(fav);
+            return new ResponseEntity<>(favoriteProduct.getProductName() + " added to favorite", HttpStatus.OK);
         }
 
         return new ResponseEntity<>(favoriteProduct.getProductName() + " is already your favorite", HttpStatus.BAD_REQUEST);
     }
 
     @Override
-    public ResponseEntity<String> removeProductFromFavorite(Long favoriteId) {
+    public ResponseEntity<String> removeProductFromFavorite(Long productId) {
 
         UserDetails loggedInUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         log.info(loggedInUser.toString());
@@ -63,13 +62,10 @@ public class FavoritesServiceImpl implements FavoritesService {
                 .orElseThrow(()-> new UserNotFoundException("User with this id does not exist. " +
                         "Please check and try again."));
 
-        Favorites favoriteProduct = favoriteRepository.findById(favoriteId)
-                .orElseThrow(()-> new NoFavoriteException("Favorite dose not exist"));
+        Favorites favoriteProduct = favoriteRepository.findFavoritesByProduct_ProductIdAndUser_UserId (productId, user.getUserId())
+                .orElseThrow(()-> new ResourceNotFoundException("This product dose not exist in your favorite"));
 
-        if(favoriteProduct.getUserId().equals(user.getUserId())) {
-            favoriteRepository.delete(favoriteProduct);
-            return new ResponseEntity<>("Your favorite has been removed.", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("You are not authorised to perform this operation", HttpStatus.FORBIDDEN);
+        favoriteRepository.delete(favoriteProduct);
+        return new ResponseEntity<>(favoriteProduct.getProduct().getProductName() + " has been removed.", HttpStatus.OK);
     }
 }

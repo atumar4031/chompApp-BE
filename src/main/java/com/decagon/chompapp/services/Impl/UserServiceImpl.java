@@ -45,8 +45,8 @@ public class UserServiceImpl implements UserService {
             user.setFirstName(editUserDto.getFirstName());
         if (editUserDto.getLastName() != null)
             user.setLastName(editUserDto.getLastName());
-        if (editUserDto.getGender() != null)
-            user.setGender(editUserDto.getGender());
+        if (editUserDto.getUsername() != null)
+            user.setUsername(editUserDto.getUsername());
 
         userRepository.save(user);
 

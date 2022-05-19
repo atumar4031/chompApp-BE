@@ -1,12 +1,9 @@
 package com.decagon.chompapp.models;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -20,8 +17,10 @@ public class Favorites {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long favoriteId;
 
-    private Long favoriteProductId;
+    @ManyToOne
+    private Product product;
 
-    private Long userId;
+    @ManyToOne
+    private User user;
 
 }

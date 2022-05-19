@@ -86,11 +86,39 @@ public class WalletServiceImpl implements WalletService {
             walletTransaction.setTransactionDate(Date.valueOf(LocalDate.now()));
             walletTransaction.setAmount(walletTransactionRequest.getAmount());
             walletTransaction.setWallet(wallet);
+            walletRepository.save(wallet);
             walletTransactionRepository.save(walletTransaction);
         }else {
             throw new InsufficientFundsException("insufficient Fund in wallet!");
         }
         return ResponseEntity.status(HttpStatus.OK).body("Transaction completed successfully \ncurrent wallet balance : "+wallet.getWalletBalance());
+    }
+
+    @Override
+    public ResponseEntity<String> processPayment(WalletTransactionRequest walletTransactionRequest) throws InsufficientFundsException{
+
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> user = userRepository.findByEmail(userEmail);
+
+        Wallet wallet = walletRepository.findWalletByUser_Email(user.get().getEmail());
+        double walletBalance = wallet.getWalletBalance();
+        double costOfProduct = walletTransactionRequest.getAmount();
+        if(walletBalance >= costOfProduct){
+
+            double newWalletBalance = walletBalance - costOfProduct;
+            wallet.setWalletBalance(newWalletBalance);
+            walletRepository.save(wallet);
+            WalletTransaction walletTransaction = new WalletTransaction();
+            walletTransaction.setTransactionDate(Date.valueOf(LocalDate.now()));
+            walletTransaction.setTransactionType(TransactionType.MAKEPAYMENT);
+            walletTransaction.setAmount(walletTransactionRequest.getAmount());
+            walletTransaction.setWallet(wallet);
+            walletTransactionRepository.save(walletTransaction);
+            return ResponseEntity.status(HttpStatus.OK).body("Transaction completed successfully!");
+        }
+        else {
+            throw new InsufficientFundsException("insufficient Fund in wallet!");
+        }
     }
 
     @Override

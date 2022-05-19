@@ -1,9 +1,7 @@
 package com.decagon.chompapp.models;
 
 import com.decagon.chompapp.enums.TransactionType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -11,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import java.sql.Date;
 
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "wallet_transaction")

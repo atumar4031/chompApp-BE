@@ -12,6 +12,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class FavoriteDto {
-    private Set<Product> favoriteProducts;
+
+    private Product product;
+
     private User user;
 }

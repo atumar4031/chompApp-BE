@@ -26,9 +26,13 @@ public class WalletController {
         return walletService.withdrawFromWallet(walletTransactionRequest);
     }
 
+    @PostMapping("/process-payment")
+    public ResponseEntity<String> processPayment(@RequestBody WalletTransactionRequest walletTransactionRequest){
+        return walletService.processPayment(walletTransactionRequest);
+    }
+
     @GetMapping("/wallet-balance")
     public ResponseEntity<String> walletBalance(){
         return walletService.checkWalletBalance();
     }
-
 }

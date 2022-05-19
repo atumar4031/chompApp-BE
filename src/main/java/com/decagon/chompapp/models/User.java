@@ -75,8 +75,9 @@ public class User {
     cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private Set<Product> favourites;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
+    cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorites> favourites;
 
     @OneToOne(mappedBy = "user", orphanRemoval = true)
     private Cart cart;

@@ -19,9 +19,9 @@ public class FavoriteController {
         return favoritesService.addProductToFavorite(productId);
     }
 
-    @DeleteMapping("/{favoriteId}/remove")
+    @DeleteMapping("/{productId}/remove")
     public ResponseEntity<?> removeProductFromFavorite (
-            @PathVariable(value = "favoriteId") Long productId
+            @PathVariable(value = "productId") Long productId
     ) {
         return favoritesService.removeProductFromFavorite(productId);
     }

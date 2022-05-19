@@ -1,7 +1,5 @@
 package com.decagon.chompapp.controllers;
 
-import com.decagon.chompapp.models.Favorites;
-import com.decagon.chompapp.models.Product;
 import com.decagon.chompapp.models.User;
 import com.decagon.chompapp.services.FavoritesService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;

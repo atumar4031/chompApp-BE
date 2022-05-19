@@ -174,4 +174,37 @@ class WalletServiceImplTest {
         Assertions.assertThat(wallet.getWalletBalance()).isEqualTo(3000.0);
     }
 
+    @Test
+    void testToProcessPayment() throws InsufficientFundsException{
+        user = User.builder()
+                .userId(1L)
+                .email("dennis@gmail.com")
+                .password("12345")
+                .username("donDen")
+                .firstName("okoye")
+                .build();
+
+        WalletTransactionRequest walletTransactionRequest = new WalletTransactionRequest();
+        walletTransactionRequest.setAmount(5000.0);
+        Wallet wallet = new Wallet();
+        wallet.setWalletBalance(30000.0);
+
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), List.of(new SimpleGrantedAuthority("PREMIUM")));
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        Mockito.when(authentication.getName()).thenReturn(userDetails.getUsername());
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(user));
+        when(walletRepository.findWalletByUser_Email(user.getEmail())).thenReturn(wallet);
+
+        ResponseEntity<String> wallet1 = walletService.processPayment(walletTransactionRequest);
+
+        assertThat(wallet1.getStatusCodeValue()).isEqualTo(200);
+        assertThat(wallet.getWalletBalance()).isNotNull();
+        assertThat(wallet.getWalletBalance()).isEqualTo(25000.0);
+    }
+
+
 }
