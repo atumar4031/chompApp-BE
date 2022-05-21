@@ -164,7 +164,7 @@ class WalletServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         Mockito.when(authentication.getName()).thenReturn(userDetails.getUsername());
         when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(user));
-        when(walletRepository.findWalletByUser_Email(user.getEmail())).thenReturn(wallet);
+        when(walletRepository.findWalletByUser_Email2(user.getEmail())).thenReturn(Optional.of(wallet));
 
 
         ResponseEntity<String> wallet1 = walletService.checkWalletBalance();
