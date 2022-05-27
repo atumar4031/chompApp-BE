@@ -106,6 +106,7 @@ public class CartServiceImpl implements CartService {
 
 
     @Override
+    @Transactional
     public ResponseEntity<String> clearCart() {
         User user = getLoggedInUser();
         Cart userCart = user.getCart();

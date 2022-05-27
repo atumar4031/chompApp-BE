@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -26,4 +27,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAllByCategory_CategoryName(Pageable pageable, @Param("categoryName") String categoryName);
 
     Optional<Product> findProductByProductId(Long productId);
+
+    @Query(value = "SELECT p FROM Product p JOIN Favorites f ON p.productId = f.product.productId WHERE f.user.userId = ?1")
+    List<Product> findAllFavoriteProductsByUserId(Long userId);
 }

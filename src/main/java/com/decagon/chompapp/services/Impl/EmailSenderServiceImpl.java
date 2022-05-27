@@ -66,6 +66,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
                 + "\n Ignore this email if you did not register, "
                 + "or you have not made the request.";
 
+        LOGGER.info(content);
         send(new EmailSenderDto(email, "Chomp: Confirm Registration", content));
     }
 

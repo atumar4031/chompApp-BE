@@ -1,12 +1,11 @@
 package com.decagon.chompapp.services;
 
-import com.decagon.chompapp.dtos.PasswordDto;
-import com.decagon.chompapp.dtos.EditUserDto;
-import com.decagon.chompapp.dtos.ResetPasswordDto;
+import com.decagon.chompapp.dtos.*;
 import org.springframework.http.ResponseEntity;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 
 public interface UserService {
@@ -20,4 +19,7 @@ public interface UserService {
 
     ResponseEntity<String> updatePassword(PasswordDto passwordDto);
 
+    ResponseEntity<List<ProductDto>> viewAllFavoriteProduct();
+    ResponseEntity<ProductDto> viewASingleFavoriteProduct( Long productId);
+    ResponseEntity<UserDto> viewUserDetails();
 }

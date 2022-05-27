@@ -2,6 +2,8 @@ package com.decagon.chompapp.controllers;
 
 import com.decagon.chompapp.dtos.EditUserDto;
 import com.decagon.chompapp.dtos.PasswordDto;
+import com.decagon.chompapp.dtos.ProductDto;
+import com.decagon.chompapp.dtos.UserDto;
 import com.decagon.chompapp.enums.Gender;
 import com.decagon.chompapp.models.Product;
 import com.decagon.chompapp.models.User;
@@ -9,6 +11,7 @@ import com.decagon.chompapp.repositories.UserRepository;
 import com.decagon.chompapp.security.CustomUserDetailsService;
 import com.decagon.chompapp.security.JwtAuthenticationEntryPoint;
 import com.decagon.chompapp.security.JwtAuthenticationFilter;
+import com.decagon.chompapp.services.CartService;
 import com.decagon.chompapp.services.Impl.UserServiceImpl;
 import com.decagon.chompapp.services.ProductServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,14 +30,17 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +53,10 @@ class UserControllerIntegrationTests {
 
     @Autowired
     UserController userController;
+
+    ProductDto productDto;
+
+    UserDto userDto;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -72,6 +82,7 @@ class UserControllerIntegrationTests {
     Authentication authentication = Mockito.mock(Authentication.class);
 
     SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+
 
 
     @Test
@@ -131,5 +142,32 @@ class UserControllerIntegrationTests {
                 .build()
                 .perform(requestBuilder);
         actualPerformResult.andExpect(MockMvcResultMatchers.status().is(100));
+    }
+
+    @Test
+    void shouldCallAGetMappingMethodAndReturnAResponseEntityOfFavoriteProductDtos() throws Exception {
+        productDto = ProductDto.builder().build();
+        ResponseEntity<List<ProductDto>>responseEntity = ResponseEntity.ok(List.of(productDto));
+        Mockito.when(userService.viewAllFavoriteProduct()).thenReturn(responseEntity);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/favorites"))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        assertThat(mvcResult).isNotNull();
+    }
+
+    @Test
+    void shouldCallAGetMappingMethodAndReturnAResponseEntityOfSingleFavoriteProductDto() throws Exception {
+        ResponseEntity<ProductDto> responseEntity = ResponseEntity.ok(productDto);
+        Mockito.when(userService.viewASingleFavoriteProduct(1L)).thenReturn(responseEntity);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/favorites/1L"))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+    }
+
+
+    @Test
+    void shouldCallAGetMappingMethodAndReturnAResponseEntityOfUserDetails() throws Exception {
+        ResponseEntity<UserDto> responseEntity = ResponseEntity.ok(userDto);
+        Mockito.when(userService.viewUserDetails()).thenReturn(responseEntity);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/display-user-details"))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
     }
 }

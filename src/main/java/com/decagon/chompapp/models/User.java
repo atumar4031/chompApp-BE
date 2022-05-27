@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Entity
 @Getter
-@Setter @ToString
+@Setter
 @AllArgsConstructor @NoArgsConstructor @Builder
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"}),  @UniqueConstraint(columnNames = {"email"})})
 public class User {
@@ -51,11 +51,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-
-
-//    @Enumerated(EnumType.STRING)
-//    private Role role;
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "roleId"))
@@ -67,19 +62,19 @@ public class User {
     private Wallet wallet;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL, orphanRemoval = true)
+            cascade = CascadeType.ALL)
     private List<Address> addressBook;
 
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
-    cascade = CascadeType.ALL, orphanRemoval = true)
+    cascade = CascadeType.ALL)
     private List<Order> orders;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
-    cascade = CascadeType.ALL, orphanRemoval = true)
+    cascade = CascadeType.ALL)
     private List<Favorites> favourites;
 
-    @OneToOne(mappedBy = "user", orphanRemoval = true)
+    @OneToOne(mappedBy = "user")
     private Cart cart;
 
     @Size(min = 30, max = 400)

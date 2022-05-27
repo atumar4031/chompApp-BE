@@ -3,7 +3,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
+
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -18,15 +21,18 @@ public class Cart {
 
     private double cartTotal;
 
-   @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+   @OneToMany(mappedBy = "cart", orphanRemoval = true, cascade = CascadeType.REMOVE)
    private List<CartItem> cartItemList;
 
+
     @JsonIgnore
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    //@JoinColumn(nullable = false, name = "user_id")
     private User user;
 
     public Cart(User user) {
         this.user = user;
     }
+
+
 }

@@ -1,14 +1,19 @@
 package com.decagon.chompapp.controllers;
 
+import com.decagon.chompapp.dtos.OrderResponse;
 import com.decagon.chompapp.dtos.ProductDto;
+import com.decagon.chompapp.models.Order;
 import com.decagon.chompapp.models.Product;
 import com.decagon.chompapp.models.ProductImage;
 import com.decagon.chompapp.services.AdminService;
 import com.decagon.chompapp.services.CloudinaryService;
+import com.decagon.chompapp.services.Impl.AdminServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/")
@@ -49,5 +54,13 @@ public class AdminServiceController {
     @DeleteMapping("delete-product/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable(value = "productId") Long productId) {
         return adminService.deleteProduct(productId);
+    }
+
+    @GetMapping("view-all-orders")
+    public ResponseEntity<OrderResponse> viewAllOrders(
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
+    ) {
+        return adminService.viewAllOrders(pageNo,pageSize);
     }
 }

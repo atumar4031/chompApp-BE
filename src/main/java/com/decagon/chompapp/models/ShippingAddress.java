@@ -1,9 +1,6 @@
 package com.decagon.chompapp.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -11,9 +8,11 @@ import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @Entity
-public class Address {
+@Builder
+public class ShippingAddress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,24 +24,22 @@ public class Address {
     private String recipientName;
 
 
+    private String streetAddress;
+
     @Email
     private String email;
-
-    private String streetAddress;
 
     private String state;
 
     private String city;
 
-//    TODO phone number format
-    @Size(max = 15)
+    //    TODO phone number format
+    @Size(max = 14)
     private String phoneNumber;
 
-    @Column(name = "is_shipping_address")
+
     private Boolean isDefaultShippingAddress;
 
-    @ManyToOne
-    private User user;
-
+//    @ManyToOne
+//    private User user;
 }
-

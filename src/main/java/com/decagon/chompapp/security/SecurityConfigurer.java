@@ -50,6 +50,15 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
+
+                .antMatchers("/checkout/**").hasAuthority("ROLE_PREMIUM")
+
+                .antMatchers("/favorite/**").permitAll()
+                .antMatchers("v3/api/-docs/**", "v2/api-docs/**",
+                        "swagger-resources/**", "webjars/**")
+                .permitAll()
+
+
                 .antMatchers("/api/admin/create-product", "/api/admin/upload-image", "/api/admin/update-product-image/{id}", "/api/admin/update-product/{id}").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/api/v1/auth/users/getAllProducts/**").permitAll()
                 .antMatchers("/**").permitAll()
@@ -65,6 +74,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                         "/webjars/**",
                         "/v3/api-docs/**",
                         "/swagger-ui/**").permitAll()
+
                 .antMatchers("/home", "/company", "/faq",
                         "/contact", "/signup", "/confirmRegistration",
                         "/h2-console/**", "/login", "/logout", "/forgot_password",
@@ -78,10 +88,14 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .antMatchers("api/v1/auth/wallet/withdrawal").hasAuthority("ROLE_PREMIUM")
                 .antMatchers("/orders").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/api/admin/delete-product/{productId}").hasAuthority("ROLE_ADMIN")
-                .antMatchers( "/checkout", "/users",
+                .antMatchers( "/checkout",
                         "/wallet", "/order-history",
                         "/favorites", "/verifyEmail")
+
                 .hasAnyAuthority("ROLE_ADMIN", "ROLE_PREMIUM")
+                .antMatchers("/api/v1/auth/users/view-a-single-favorite-product").hasAnyAuthority("ROLE_ADMIN", "ROLE_PREMIUM")
+                .antMatchers("/api/v1/auth/users/favorites").hasAnyAuthority("ROLE_ADMIN", "ROLE_PREMIUM")
+                .antMatchers("/api/v1/auth/users/favorites/{productId}").hasAnyAuthority("ROLE_ADMIN", "ROLE_PREMIUM")
                 .anyRequest()
                 .authenticated()
                 .and()

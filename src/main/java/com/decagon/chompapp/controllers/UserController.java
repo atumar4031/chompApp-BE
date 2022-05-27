@@ -9,6 +9,11 @@ import com.decagon.chompapp.services.ProductServices;
 import com.decagon.chompapp.services.UserService;
 import com.decagon.chompapp.utils.AppConstants;
 import lombok.AllArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.decagon.chompapp.dtos.PasswordDto;
@@ -19,11 +24,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.OK;
 
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 @RequestMapping( "/api/v1/auth/users")
 public class UserController {
 
@@ -74,4 +82,22 @@ public class UserController {
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto, HttpServletRequest request) {
         return new ResponseEntity<>(userService.resetPassword(resetPasswordDto, request.getHeader("Authorization")), OK);
     }
+
+    @GetMapping("/favorites")
+    public ResponseEntity<List<ProductDto>> viewAllFavoriteProducts(){
+        return userService.viewAllFavoriteProduct();
+    }
+
+    @GetMapping("/favorites/{productId}")
+    public ResponseEntity<ProductDto> viewASingleFavoriteProduct(
+            @PathVariable("productId") Long productId) {
+        return userService.viewASingleFavoriteProduct(productId);
+    }
+
+    @GetMapping("/display-user-details")
+        public ResponseEntity<UserDto> displayUserDetails(){
+        return userService.viewUserDetails();
+    }
+
+
 }

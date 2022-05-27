@@ -1,9 +1,9 @@
 package com.decagon.chompapp.models;
+
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
 
 
 @Getter
@@ -12,14 +12,10 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Entity
 @Builder
-public class CartItem {
-
+public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cartItemId;
-
-    @OneToOne
-    private Product product;
+    private Long orderItemId;
 
     @Column(name = "quantity")
     private @NotNull int quantity;
@@ -27,10 +23,11 @@ public class CartItem {
     @Column(name = "price")
     private @NotNull double subTotal;
 
-    @ManyToOne
-//            ( cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_Id", referencedColumnName = "cartId")
-    private Cart cart;
+    @OneToOne
+    private Product product;
+
+    @ManyToOne()
+    private Order order;
 
 
 }
