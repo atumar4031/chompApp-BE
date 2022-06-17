@@ -21,6 +21,10 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 
+import static com.decagon.chompapp.services.Impl.OrderServicesImpl.getOrderResponseDto;
+
+
+
 @Service
 @Slf4j
 public class CheckoutServiceImpl implements CheckoutService {
@@ -78,25 +82,7 @@ public class CheckoutServiceImpl implements CheckoutService {
     }
 
     private OrderResponseDto convertOrderToOrderResponseDto(Order order) {
-        return OrderResponseDto.builder()
-                .subTotal(order.getTotalPrice())
-                .total(order.getFlatRate() + order.getTotalPrice())
-                .dateOrdered(order.getDateOrdered())
-                .flatRate(order.getFlatRate())
-                .shippingAddress(order.getShippingAddress())
-                .status(order.getStatus())
-                .paymentMethod(order.getPaymentMethod())
-                .shippingMethod(order.getShippingMethod())
-                .productList(order.getOrderItems().stream().map(orderItem -> Product.builder()
-                        .productId(orderItem.getProduct().getProductId())
-                        .size(orderItem.getProduct().getSize())
-                        .productName(orderItem.getProduct().getProductName())
-                        .productPrice(orderItem.getProduct().getProductPrice())
-                        .productImage(orderItem.getProduct().getProductImage())
-                        .createdDate(orderItem.getProduct().getCreatedDate())
-
-                        .build()).collect(Collectors.toList()))
-                .build();
+        return getOrderResponseDto(order);
 
     }
 

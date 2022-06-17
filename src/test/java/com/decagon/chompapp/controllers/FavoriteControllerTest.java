@@ -2,6 +2,7 @@ package com.decagon.chompapp.controllers;
 
 import com.decagon.chompapp.models.User;
 import com.decagon.chompapp.services.FavoritesService;
+import com.decagon.chompapp.services.paystack.PaymentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,10 @@ public class FavoriteControllerTest {
 
     @MockBean
     private FavoritesService favoritesService;
+
+    @MockBean
+    private PaymentServiceImpl paymentService;
+
 
     User user1 = User.builder()
             .userId(1L)

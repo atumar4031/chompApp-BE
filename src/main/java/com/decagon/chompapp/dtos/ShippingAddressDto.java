@@ -32,6 +32,7 @@ public class ShippingAddressDto {
     private String city;
 
 
+
     @Size(max = 14)
     private String phoneNumber;
 

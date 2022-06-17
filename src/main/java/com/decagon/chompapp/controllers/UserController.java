@@ -5,6 +5,7 @@ import com.decagon.chompapp.dtos.EditUserDto;
 import com.decagon.chompapp.dtos.ProductDto;
 import com.decagon.chompapp.dtos.PasswordDto;
 import com.decagon.chompapp.dtos.ProductResponse;
+import com.decagon.chompapp.services.OrderServices;
 import com.decagon.chompapp.services.ProductServices;
 import com.decagon.chompapp.services.UserService;
 import com.decagon.chompapp.utils.AppConstants;
@@ -39,6 +40,8 @@ public class UserController {
     private final UserService userService;
 
     private final ProductServices productServices;
+
+    private final OrderServices orderServices;
 
     @PutMapping("/edit")
     public ResponseEntity<String> editUserDetails(@Valid @RequestBody EditUserDto editUserDto) {
@@ -98,6 +101,15 @@ public class UserController {
     @GetMapping("/display-user-details")
         public ResponseEntity<UserDto> displayUserDetails(){
         return userService.viewUserDetails();
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<OrderResponse> viewOrderHistoryForAPremiumUser (
+            @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY_ORDER, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
+        return orderServices.viewOrderHistoryForAPremiumUser(pageNo,pageSize,sortBy,sortDir);
     }
 
 

@@ -1,13 +1,15 @@
 package com.decagon.chompapp.services.Impl;
 
+import com.decagon.chompapp.dtos.OrderDto;
+import com.decagon.chompapp.dtos.OrderResponseDto;
 import com.decagon.chompapp.dtos.ProductDto;
+import com.decagon.chompapp.dtos.ShippingAddressDto;
+import com.decagon.chompapp.enums.OrderStatus;
+import com.decagon.chompapp.enums.PaymentMethod;
+import com.decagon.chompapp.enums.ShippingMethod;
 import com.decagon.chompapp.exceptions.ProductNotFoundException;
-import com.decagon.chompapp.models.Category;
-import com.decagon.chompapp.models.Product;
-import com.decagon.chompapp.models.ProductImage;
-import com.decagon.chompapp.repositories.CategoryRepository;
-import com.decagon.chompapp.repositories.ProductImageRepository;
-import com.decagon.chompapp.repositories.ProductRepository;
+import com.decagon.chompapp.models.*;
+import com.decagon.chompapp.repositories.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,10 +17,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +43,18 @@ class AdminServiceImplTest {
     @Mock
     private ProductImageRepository productImageRepository;
 
+    @Mock
+    OrderRepository orderRepository;
+
+    @Mock
+    CartRepository cartRepository;
+
+    @Mock
+    private ShippingAddressRepository shippingAddressRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
+
 
 
 
@@ -48,6 +66,21 @@ class AdminServiceImplTest {
     Product product;
     Category category;
     ProductImage productImage;
+    Pageable pageable;
+
+    Page<Order> orders;
+
+
+
+    User user;
+    Cart userCart;
+    CartItem cartItem, cartItem1;
+    Order newOrder;
+    OrderItem orderItem;
+    OrderDto orderDto;
+    ShippingAddress shippingAddress;
+    ShippingAddressDto shippingAddressDto;
+    OrderResponseDto orderResponseDto;
 
     @BeforeEach
     void setUp() {
@@ -78,6 +111,11 @@ class AdminServiceImplTest {
                 .productImageId(1L)
                 .imageURL("http://res.cloudinary.com/deenn/image/upload/v1652303973/gcljvikqbxofsgkr11cl.png")
                 .build();
+
+
+
+
+
 
     }
 
@@ -142,5 +180,82 @@ class AdminServiceImplTest {
         verify(this.productRepository).deleteById((Long) any());
         when(this.productRepository.findProductByProductId((Long) any())).thenReturn(Optional.empty());
         assertThrows(ProductNotFoundException.class, () -> this.adminService.deleteProduct(123L));
+    }
+
+    @Test
+    void viewParticularOrder() {
+
+        user = User.builder().userId(1L).email("ukeloveth247@gmail.com").firstName("Loveth").build();
+        userCart = Cart.builder().cartId(1L).user(user).cartItemList(new ArrayList<>()).cartTotal(0).quantity(0).build();
+        user.setCart(userCart);
+        cartItem = CartItem.builder().cartItemId(1L).cart(userCart).product(product).quantity(2).subTotal(product.getProductPrice() * 2).build();
+        cartItem1 = CartItem.builder().cartItemId(1L).cart(userCart).product(product).quantity(2).subTotal(product.getProductPrice() * 2).build();
+        List<CartItem> cartItemList = new ArrayList<>();
+        cartItemList.add(cartItem);
+        cartItemList.add(cartItem1);
+        user.getCart().setCartItemList(cartItemList);
+        user.getCart().setQuantity(2);
+        user.getCart().setCartTotal(cartItem1.getSubTotal());
+        cartRepository.save(userCart);
+        orderItem=OrderItem.builder()
+                .quantity(cartItem1.getQuantity())
+                .product(cartItem1.getProduct())
+                .subTotal(cartItem1.getSubTotal())
+                .build();
+        shippingAddressDto = ShippingAddressDto.builder()
+                .city("djfhds")
+                .email("jdf@gmail.com")
+                .isDefaultShippingAddress(true)
+                .build();
+        orderDto = OrderDto.builder()
+                .paymentType(PaymentMethod.PAY_WITH_CARD)
+                .shippingMethod(ShippingMethod.FLAT_RATE)
+                .shippingAddress(shippingAddressDto)
+                .build();
+
+        newOrder = Order.builder()
+                .orderId(1L)
+                .dateOrdered(new Date())
+                .paymentMethod(orderDto.getPaymentType())
+                .shippingAddress(shippingAddressRepository.save(modelMapper.map(orderDto.getShippingAddress(), ShippingAddress.class)))
+                .status(OrderStatus.PENDING)
+                .shippingMethod(orderDto.getShippingMethod())
+                .user(user)
+                .flatRate(userCart.getCartItemList().size() * 100.00)
+                .totalPrice(userCart.getCartTotal())
+                .orderItems(userCart.getCartItemList().stream().map(cartItem -> OrderItem.builder()
+                        .quantity(cartItem.getQuantity())
+                        .product(cartItem.getProduct())
+                        .subTotal(cartItem.getSubTotal())
+                        .build()
+                ).collect(Collectors.toList()))
+                .build();
+
+        orderResponseDto = OrderResponseDto.builder()
+                .orderId(newOrder.getOrderId())
+                .subTotal(newOrder.getTotalPrice())
+                .total(newOrder.getFlatRate() + newOrder.getTotalPrice())
+                .dateOrdered(newOrder.getDateOrdered())
+                .flatRate(newOrder.getFlatRate())
+                .shippingAddress(newOrder.getShippingAddress())
+                .status(newOrder.getStatus())
+                .paymentMethod(newOrder.getPaymentMethod())
+                .shippingMethod(newOrder.getShippingMethod())
+                .productList(newOrder.getOrderItems().stream().map(orderItem -> Product.builder()
+                        .productId(orderItem.getProduct().getProductId())
+                        .size(orderItem.getProduct().getSize())
+                        .productName(orderItem.getProduct().getProductName())
+                        .productPrice(orderItem.getProduct().getProductPrice())
+                        .productImage(orderItem.getProduct().getProductImage())
+                        .createdDate(orderItem.getProduct().getCreatedDate())
+                        .build()).collect(Collectors.toList()))
+                .build();
+
+        when(orderRepository.findOrderByOrderId(anyLong())).thenReturn(Optional.of(newOrder));
+        ResponseEntity<OrderResponseDto> orderResponseDtoResponseEntity = adminService.viewParticularOrder(newOrder.getOrderId());
+        org.assertj.core.api.Assertions.assertThat(orderResponseDtoResponseEntity).isNotNull();
+        Assertions.assertEquals(orderResponseDtoResponseEntity.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(Objects.requireNonNull(orderResponseDtoResponseEntity.getBody()).getOrderId(), orderResponseDto.getOrderId());
+        verify(orderRepository, times(1)).findOrderByOrderId(anyLong());
     }
 }

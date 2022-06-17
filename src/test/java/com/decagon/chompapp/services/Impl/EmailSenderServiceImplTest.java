@@ -1,6 +1,7 @@
 package com.decagon.chompapp.services.Impl;
 
 import com.decagon.chompapp.dtos.EmailSenderDto;
+import com.decagon.chompapp.services.paystack.PaymentServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -27,6 +28,10 @@ class EmailSenderServiceImplTest {
 
     @MockBean
     JavaMailSender mailSender;
+
+    @MockBean
+    private PaymentServiceImpl paymentService;
+
 
     @MockBean
     MimeMessageHelper helper;

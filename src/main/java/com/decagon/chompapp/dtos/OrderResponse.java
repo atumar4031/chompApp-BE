@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class OrderResponse {
 
-    private List<Order> content;
+    private List<OrderResponseDto> content;
     private int pageNo;
     private int pageSize;
     private long totalElements;

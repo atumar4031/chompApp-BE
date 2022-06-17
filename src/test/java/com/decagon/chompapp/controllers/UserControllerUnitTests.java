@@ -1,11 +1,12 @@
 package com.decagon.chompapp.controllers;
 
-import com.decagon.chompapp.dtos.ProductDto;
-import com.decagon.chompapp.dtos.ProductResponse;
-import com.decagon.chompapp.models.Category;
-import com.decagon.chompapp.models.Product;
-import com.decagon.chompapp.models.User;
+import com.decagon.chompapp.dtos.*;
+import com.decagon.chompapp.enums.OrderStatus;
+import com.decagon.chompapp.enums.PaymentMethod;
+import com.decagon.chompapp.models.*;
+import com.decagon.chompapp.services.OrderServices;
 import com.decagon.chompapp.services.ProductServices;
+import com.decagon.chompapp.services.paystack.PaymentServiceImpl;
 import com.decagon.chompapp.utils.AppConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -20,10 +21,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -35,8 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(SpringExtension.class)
@@ -53,10 +60,29 @@ public class UserControllerUnitTests {
     @MockBean
     private ProductServices productServices;
 
+    @MockBean
+    private PaymentServiceImpl paymentService;
+
+    @MockBean
+    private OrderServices orderServices;
+
     ResponseEntity<ProductResponse> responseEntity;
 
     User user;
 
+    User user1;
+
+    UserDetails userDetails;
+
+    Page<Order> orders;
+
+    Order newOrder;
+
+    List<OrderItem> orderItems= new ArrayList<>();
+
+    OrderResponseDto orderResponseDto;
+
+    ResponseEntity<OrderResponse> responseEntity2;
 
     @BeforeEach
     void setUp() throws ServletException {
@@ -82,9 +108,9 @@ public class UserControllerUnitTests {
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         responseEntity = new ResponseEntity<>(productResponse, httpHeaders, HttpStatus.OK);
-        Mockito.when(productServices.getAllProducts(anyInt(), anyInt(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(responseEntity);
-        Mockito.when(productServices.fetchSingleProductById(anyLong())).thenReturn(new ResponseEntity<>(productDto, httpHeaders, HttpStatus.OK));
-        Mockito.when(productServices.getAllProducts(anyInt(), anyInt(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(responseEntity);
+        when(productServices.getAllProducts(anyInt(), anyInt(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(responseEntity);
+        when(productServices.fetchSingleProductById(anyLong())).thenReturn(new ResponseEntity<>(productDto, httpHeaders, HttpStatus.OK));
+        when(productServices.getAllProducts(anyInt(), anyInt(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(responseEntity);
     }
 
     @Test
@@ -118,14 +144,75 @@ public class UserControllerUnitTests {
     void testsThatTheControllerListensForCorrectHttpRequestWhichIsGetForSingleProduct() throws Exception {
         ProductDto productDto = ProductDto.builder().productId(1L).productName("Cheesy Burger").productPrice(1000.00)
                 .categoryName("sides").build();
-        Mockito.when(productServices.fetchSingleProductById(1L)).thenReturn(new ResponseEntity<>(productDto, HttpStatus.OK));
+        when(productServices.fetchSingleProductById(1L)).thenReturn(new ResponseEntity<>(productDto, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/auth/users/fetch-single-product/1").accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
     void testsThatTheControllerListensForCorrectHttpRequestWhichIsGetAndThrows500IfNotGetSingleProduct() throws Exception {
-        Mockito.when(productServices.fetchSingleProductById(1L)).thenThrow(new RuntimeException());
+        when(productServices.fetchSingleProductById(1L)).thenThrow(new RuntimeException());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/auth/users/fetch-single-product/1").accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isInternalServerError());
+    }
+
+    @Test
+    void viewOrderHistoryForAPremiumUser () throws Exception {
+        user1 = User.builder()
+                .userId(1L)
+                .email("james@mail.com")
+                .password("password")
+                .username("james@mail.com")
+                .firstName("James")
+                .build();
+        userDetails = new org.springframework.security.core.userdetails.User(user1.getEmail(), user1.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_PREMIUM")));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(),userDetails.getPassword(),userDetails.getAuthorities());
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        newOrder = Order.builder()
+                .orderId(1L)
+                .flatRate(0.00)
+                .totalPrice(1000.00)
+                .orderItems(orderItems)
+                .status(OrderStatus.PENDING)
+                .paymentMethod(PaymentMethod.PAY_WITH_CARD)
+                .shippingAddress(new ShippingAddress())
+                .orderItems(orderItems)
+                .user(user1)
+                .build();
+        List<Order> listOfOrders = new ArrayList<>();
+        listOfOrders.add(newOrder);
+        orders = new PageImpl<>(listOfOrders);
+        orderResponseDto = OrderResponseDto.builder()
+                .orderId(newOrder.getOrderId())
+                .flatRate(newOrder.getFlatRate())
+                .total(newOrder.getTotalPrice())
+                .status(newOrder.getStatus())
+                .paymentMethod(newOrder.getPaymentMethod())
+                .shippingAddress(newOrder.getShippingAddress())
+                .build();
+        List<OrderResponseDto> content = new ArrayList<>();
+        content.add(orderResponseDto);
+        OrderResponse orderResponse = OrderResponse.builder()
+                .content(content)
+                .pageNo(orders.getNumber())
+                .totalPages(orders.getTotalPages())
+                .pageSize(orders.getSize())
+                .totalElements(orders.getTotalElements())
+                .last(orders.isLast())
+                .build();
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        responseEntity2 = new ResponseEntity<>(orderResponse, httpHeaders, HttpStatus.OK);
+        Mockito.when(orderServices.viewOrderHistoryForAPremiumUser(anyInt(),anyInt(),anyString(),anyString())).thenReturn(responseEntity2);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/users/orders").accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
+
+        mockMvc.perform((MockMvcRequestBuilders.get("/api/v1/auth/users/orders").param("pageNo", AppConstants.DEFAULT_PAGE_NUMBER).param("pageSize", AppConstants.DEFAULT_PAGE_SIZE).param("sortBy", AppConstants.DEFAULT_SORT_BY_ORDER)).accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(jsonPath("$.pageNo").value(0)).andExpect(jsonPath("$.pageSize").value(1)).andExpect(jsonPath("$.totalElements").value(1)).andExpect(jsonPath("$.totalPages").value(1)).andExpect(jsonPath("$.last").value(true)).andReturn();
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(orderServices,times(1)).viewOrderHistoryForAPremiumUser(integerArgumentCaptor.capture(),integerArgumentCaptor.capture(),stringArgumentCaptor.capture(),stringArgumentCaptor.capture());
+        Assertions.assertEquals(integerArgumentCaptor.getValue(),10);
     }
 }

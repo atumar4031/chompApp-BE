@@ -1,12 +1,10 @@
 package com.decagon.chompapp.services;
 
 import com.decagon.chompapp.dtos.OrderResponse;
+import com.decagon.chompapp.dtos.OrderResponseDto;
 import com.decagon.chompapp.dtos.ProductDto;
-import com.decagon.chompapp.models.Order;
 import com.decagon.chompapp.models.ProductImage;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 public interface AdminService {
 
@@ -16,6 +14,7 @@ public interface AdminService {
     ResponseEntity<ProductImage> updateProductImage(String productImageURL, Long productId);
     ResponseEntity<String> deleteProduct(long productId);
     ResponseEntity<OrderResponse> viewAllOrders(int pageNo, int pageSize);
+    ResponseEntity<OrderResponseDto> viewParticularOrder(long orderId);
 
 
 }

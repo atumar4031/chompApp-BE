@@ -31,7 +31,6 @@ public class Order {
 
     private Double totalPrice;
 
-
     private Double flatRate;
 
     @Enumerated(EnumType.STRING)

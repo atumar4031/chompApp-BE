@@ -13,6 +13,7 @@ import com.decagon.chompapp.security.JwtAuthenticationEntryPoint;
 import com.decagon.chompapp.security.JwtAuthenticationFilter;
 import com.decagon.chompapp.services.CartService;
 import com.decagon.chompapp.services.Impl.UserServiceImpl;
+import com.decagon.chompapp.services.OrderServices;
 import com.decagon.chompapp.services.ProductServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,8 @@ class UserControllerIntegrationTests {
 
     SecurityContext securityContext = Mockito.mock(SecurityContext.class);
 
-
+    @MockBean
+    OrderServices orderServices;
 
     @Test
     void editUserDetails() throws Exception {
