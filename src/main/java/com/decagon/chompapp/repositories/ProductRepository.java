@@ -4,12 +4,14 @@ import com.decagon.chompapp.models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-
+@Transactional
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE " + "LOWER(" + "CONCAT(p.productId, p.productName, p.quantity, p.productImage, p.productPrice,p.category.categoryName))" + "LIKE %?1%")
     Page<Product> findAllByFilterParam (Pageable pageable, String filterParam);
@@ -30,4 +32,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query(value = "SELECT p FROM Product p JOIN Favorites f ON p.productId = f.product.productId WHERE f.user.userId = ?1")
     List<Product> findAllFavoriteProductsByUserId(Long userId);
+
+    @Modifying
+    @Query(value = "delete from Product p where p.productId=:productId")
+    void deleteById(@Param("productId")long productId);
 }

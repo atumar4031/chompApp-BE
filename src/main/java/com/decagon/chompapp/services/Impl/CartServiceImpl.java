@@ -2,6 +2,7 @@ package com.decagon.chompapp.services.Impl;
 import com.decagon.chompapp.dtos.CartDto;
 import com.decagon.chompapp.models.CartItem;
 import com.decagon.chompapp.services.CartService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Transactional
 @AllArgsConstructor
+@Slf4j
 @Service
 public class CartServiceImpl implements CartService {
     private CartRepository cartRepository;
@@ -33,8 +35,9 @@ public class CartServiceImpl implements CartService {
 
     private User getLoggedInUser(){
         var authentication = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info(authentication);
         return userRepository.findByUsernameOrEmail(authentication, authentication)
-                .orElseThrow(()-> new RuntimeException("User not authorized"));
+                .orElseThrow(()-> new RuntimeException("User not found"));
     }
 
     private void removeItem(long cartItemId, Cart cart, CartItem cartItem) {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/cart")
+@CrossOrigin("*")
 public class CartController {
 
     private CartService cartService;
@@ -18,6 +19,8 @@ public class CartController {
     @PostMapping("/add-to-cart/{productId}")
     public ResponseEntity<CartItemDto> addToCart(@PathVariable("productId") long productId){
 
+        System.err.println(productId);
+
         return cartService.addToCart(productId);
     }
 
@@ -25,6 +28,8 @@ public class CartController {
     public ResponseEntity<String> clearCart() {
         return cartService.clearCart();
     }
+
+
     @PutMapping("/reduce-item-quantity/{cart-item-id}")
     public ResponseEntity<String> reduceItemQuantity(@PathVariable("cart-item-id") long cartItemId) {
         return cartService.reduceQuantityInCart(cartItemId);

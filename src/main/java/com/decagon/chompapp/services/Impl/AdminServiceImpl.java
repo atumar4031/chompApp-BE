@@ -64,6 +64,7 @@ public class AdminServiceImpl implements AdminService {
         product.setProductPrice(productDto.getProductPrice());
         product.setSize(productDto.getSize());
         product.setQuantity(productDto.getQuantity());
+        product.setProductDescription(productDto.getProductDescription());
         Product savedProduct = productRepository.save(product);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Product created successfully with product id " + savedProduct.getProductId());
@@ -87,7 +88,7 @@ public class AdminServiceImpl implements AdminService {
         product.setProductName(productDto.getProductName());
         product.setSize(productDto.getSize());
         product.setQuantity(productDto.getQuantity());
-
+        product.setProductDescription(productDto.getProductDescription());
         Product updatedProduct = productRepository.save(product);
 
         return ResponseEntity.ok("Product updated successfully with product id " + updatedProduct.getProductId()) ;
@@ -114,12 +115,15 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public ResponseEntity<String> deleteProduct(Long productId) {
+    public ResponseEntity<String> deleteProduct(long productId) {
 
-        Optional<Product> product = productRepository.findProductByProductId(productId);
-        if (!product.isPresent()) {
-            throw new ProductNotFoundException("Product not found!");
-        }
+//        Optional<Product> product = productRepository.findProductByProductId(productId);
+//        if (!product.isPresent()) {
+//            throw new ProductNotFoundException("Product not found!");
+//        }
+        productImageRepository.deleteByProduct(productId);
+//        productImageRepository.deleteByProduct(product.get());
+        System.out.println(productId);
         productRepository.deleteById(productId);
         return ResponseEntity.status(HttpStatus.OK).body("Product deleted successfully");
     }

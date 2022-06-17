@@ -64,8 +64,8 @@ public class ProductServicesImpl implements ProductServices {
 
     @Override
     public ResponseEntity<ProductDto> fetchSingleProductById(Long productId) {
-        String loggedInUserName = SecurityContextHolder.getContext().getAuthentication().getName();
-        userRepository.findByEmail(loggedInUserName).orElseThrow(() -> new RuntimeException("User not found."));
+//        String loggedInUserName = SecurityContextHolder.getContext().getAuthentication().getName();
+//        userRepository.findByEmail(loggedInUserName).orElseThrow(() -> new RuntimeException("User not found."));
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found."));
         ProductDto productDto = convertProductEntityToDto(product);
         return new ResponseEntity<>(productDto, HttpStatus.OK);
@@ -100,6 +100,7 @@ public class ProductServicesImpl implements ProductServices {
                 .productPrice(product.getProductPrice())
                 .productImage(product.getProductImage())
                 .categoryName(product.getCategory().getCategoryName())
+                .productDescription(product.getProductDescription())
                 .build();
     }
 }

@@ -134,8 +134,10 @@ public class UserServiceImpl implements UserService {
         );
 
         UserDto userDto = new UserDto();
-        userDto.setGender(String.valueOf(user.getGender()));
+//        userDto.setGender(String.valueOf(user.getGender()));
+        userDto.setGender(user.getGender());
         BeanUtils.copyProperties(user, userDto);
+
 
         return new ResponseEntity<>(userDto, HttpStatus.OK);
 

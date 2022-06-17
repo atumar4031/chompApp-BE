@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/")
+@CrossOrigin("*")
 public class AdminServiceController {
 
     private final AdminService adminService;
@@ -35,13 +36,13 @@ public class AdminServiceController {
         return adminService.createProduct(productDto);
     }
 
-    @PostMapping("upload-image")
-    public ResponseEntity<ProductImage> uploadImage(@RequestPart MultipartFile image, @RequestParam("id") Product product){
+    @PostMapping("upload-image/{id}")
+    public ResponseEntity<ProductImage> uploadImage(@RequestPart MultipartFile image, @PathVariable("id") Product product){
         return adminService.saveProductImage(cloudinaryService.uploadFile(image), product.getProductId());
     }
 
     @PutMapping("update-product/{id}")
-    public ResponseEntity<String> updateProduct(@RequestBody ProductDto productDto, @PathVariable long id){
+    public ResponseEntity<String> updateProduct(@RequestBody ProductDto productDto, @PathVariable("id") long id){
         return adminService.updateProduct(productDto, id);
     }
 
@@ -52,7 +53,7 @@ public class AdminServiceController {
     }
 
     @DeleteMapping("delete-product/{productId}")
-    public ResponseEntity<String> deleteProduct(@PathVariable(value = "productId") Long productId) {
+    public ResponseEntity<String> deleteProduct(@PathVariable(value = "productId") long productId) {
         return adminService.deleteProduct(productId);
     }
 

@@ -14,7 +14,7 @@ public interface AdminService {
     ResponseEntity<ProductImage> saveProductImage(String productImageURL, Long productId);
     ResponseEntity<String> updateProduct(ProductDto productDto, Long productId);
     ResponseEntity<ProductImage> updateProductImage(String productImageURL, Long productId);
-    ResponseEntity<String> deleteProduct(Long productId);
+    ResponseEntity<String> deleteProduct(long productId);
     ResponseEntity<OrderResponse> viewAllOrders(int pageNo, int pageSize);
 
 

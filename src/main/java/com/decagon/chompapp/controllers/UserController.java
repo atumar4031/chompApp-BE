@@ -33,6 +33,7 @@ import static org.springframework.http.HttpStatus.OK;
 @AllArgsConstructor
 @Slf4j
 @RequestMapping( "/api/v1/auth/users")
+@CrossOrigin("*")
 public class UserController {
 
     private final UserService userService;

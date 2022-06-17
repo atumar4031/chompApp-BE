@@ -1,5 +1,6 @@
 package com.decagon.chompapp.dtos;
 
+import com.decagon.chompapp.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ public class SignUpDto {
         private String firstName;
         private String lastName;
         private String username;
+        private Gender gender;
 
         @NotNull
         @NotBlank(message = "Email is required")

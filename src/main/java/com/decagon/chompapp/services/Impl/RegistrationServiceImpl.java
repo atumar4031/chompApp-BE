@@ -48,11 +48,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         user.setUsername(signUpDto.getUsername());
         user.setLastName(signUpDto.getLastName());
         user.setEmail(signUpDto.getEmail());
+        user.setGender(signUpDto.getGender());
         user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
 
         Optional<Role> roles = roleRepository.findByName("ROLE_PREMIUM");
         user.setRoles(Collections.singleton(roles.get()));
-        user.setIsEnabled(false);
+//        user.setIsEnabled(false);
+        user.setIsEnabled(true);
 
 
         return verifyRegistration(user, request);
@@ -66,7 +68,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         Cart cart = new Cart(savedUser);
         cartRepository.save(cart);
 
-        emailSender.sendRegistrationEmail(user.getEmail(), token);
+
+//        emailSender.sendRegistrationEmail(user.getEmail(), token);
         return new ResponseEntity<>("User registered successfully. Kindly check your mail inbox or junk folder to verify your account", HttpStatus.OK );
     }
     @Override

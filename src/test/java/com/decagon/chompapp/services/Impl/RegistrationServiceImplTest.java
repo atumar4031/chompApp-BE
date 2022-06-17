@@ -1,6 +1,7 @@
 package com.decagon.chompapp.services.Impl;
 
 import com.decagon.chompapp.dtos.SignUpDto;
+import com.decagon.chompapp.enums.Gender;
 import com.decagon.chompapp.models.Cart;
 import com.decagon.chompapp.models.Role;
 import com.decagon.chompapp.models.User;
@@ -56,7 +57,7 @@ class RegistrationServiceImplTest {
     @BeforeEach
     void setUp() {
         signUpDto = new SignUpDto("Stanley", "Nkannebe",
-                "funkystan", "funkystan@gmail.com", "12345");
+                "funkystan",Gender.MALE,"funkystan@gmail.com", "12345");
 
         request = Mockito.mock(HttpServletRequest.class);
         role = Role.builder().name("ROLE_PREMIUM").build();

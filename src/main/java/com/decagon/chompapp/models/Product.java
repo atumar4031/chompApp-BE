@@ -36,6 +36,8 @@ public class Product {
 
     private double productPrice;
 
+    private String productDescription;
+
     @ManyToOne
     private Category category;
 

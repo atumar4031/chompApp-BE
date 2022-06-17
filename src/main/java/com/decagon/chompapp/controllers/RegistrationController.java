@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 
 @RequiredArgsConstructor
 @RestController
+@CrossOrigin("*")
 public class RegistrationController {
     private final RegistrationService registrationService;
 

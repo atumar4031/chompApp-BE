@@ -42,7 +42,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 //        super.configure(http);
         http
-                .csrf().disable()
+                .cors().and().csrf().disable()
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
@@ -63,6 +63,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/auth/users/getAllProducts/**").permitAll()
                 .antMatchers("/**").permitAll()
                 .antMatchers("/api/v1/auth/users/getAllProducts/**").permitAll()
+                .antMatchers("/api/v1/auth/users/display-user-details").hasAuthority("ROLE_PREMIUM")
                 .antMatchers("/api/v1/auth/users/getAllProducts").permitAll()
                 .antMatchers("/favorite/**").permitAll()
                 .antMatchers("/v2/api-docs",
@@ -81,8 +82,10 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                         "/api/v1/auth/login", "/verifyEmail", "/api/v1/auth/users/forgot-password",
                         "/api/v1/auth/users/enter-password", "/api/v1/auth/users/reset-password",
                         "/api/v1/auth/logout", "/cart/**")
+
                 .permitAll()
-                .antMatchers("/api/v1/auth/users/fetch-single-product").hasAnyAuthority("ROLE_ADMIN", "ROLE_PREMIUM", "ROLE_ANONYMOUS")
+                .antMatchers("/cart/add-to-cart/{productId}/**").permitAll()
+                .antMatchers("/api/v1/auth/users/fetch-single-product").permitAll()
                 .antMatchers("/admin").hasAuthority("ROLE_ADMIN")
                 .antMatchers("api/v1/auth/wallet/fund-wallet").hasAuthority("ROLE_PREMIUM")
                 .antMatchers("api/v1/auth/wallet/withdrawal").hasAuthority("ROLE_PREMIUM")
