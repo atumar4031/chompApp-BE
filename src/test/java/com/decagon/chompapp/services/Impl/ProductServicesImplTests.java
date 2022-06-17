@@ -64,33 +64,33 @@ class ProductServicesImplTests {
         verify(productRepository).findAll(pageable);
     }
 
-    @Test
-    void test_fetchSingleProduct() {
-        Category category = Category.builder()
-                .categoryId(1L)
-                .categoryName("sides")
-                .build();
-        Product product = Product.builder()
-                .productId(1L)
-                .productName("Cheesy Burger")
-                .productPrice(1000.00)
-                .category(category)
-                .build();
-        ProductDto productDto = ProductDto.builder().productId(1L).productName("Cheesy Burger").productPrice(1000.00)
-                .categoryName("sides").build();
-        user = User.builder().email("stanley@gmail.com").build();
-
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(authentication.getName()).thenReturn(user.getEmail());
-        Mockito.when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
-
-        productRepository.save(product);
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        productServicesImpl.fetchSingleProductById(1L);
-        verify(productRepository).findById(any());
-
-    }
+//    @Test
+//    void test_fetchSingleProduct() {
+//        Category category = Category.builder()
+//                .categoryId(1L)
+//                .categoryName("sides")
+//                .build();
+//        Product product = Product.builder()
+//                .productId(1L)
+//                .productName("Cheesy Burger")
+//                .productPrice(1000.00)
+//                .category(category)
+//                .build();
+//        ProductDto productDto = ProductDto.builder().productId(1L).productName("Cheesy Burger").productPrice(1000.00)
+//                .categoryName("sides").build();
+//        user = User.builder().email("stanley@gmail.com").build();
+//
+//        Authentication authentication = mock(Authentication.class);
+//        SecurityContext securityContext = mock(SecurityContext.class);
+//        when(securityContext.getAuthentication()).thenReturn(authentication);
+//        SecurityContextHolder.setContext(securityContext);
+//        Mockito.when(authentication.getName()).thenReturn(user.getEmail());
+//        Mockito.when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+//
+//        productRepository.save(product);
+//        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+//        productServicesImpl.fetchSingleProductById(1L);
+//        verify(productRepository).findById(any());
+//
+//    }
 }

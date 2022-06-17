@@ -171,16 +171,16 @@ class AdminServiceImplTest {
         verify(productImageRepository).save(any());
         verify(productRepository).save(any());
     }
-    @Test
-    void testForAdminToDeleteProduct() {
-        doThrow(new ProductNotFoundException("Product is not found!")).when(this.productRepository).deleteById((Long) any());
-        when(this.productRepository.findProductByProductId((Long) any())).thenReturn(Optional.of(product));
-        assertThrows(ProductNotFoundException.class, () -> this.adminService.deleteProduct(123L));
-        verify(this.productRepository).findProductByProductId((Long) any());
-        verify(this.productRepository).deleteById((Long) any());
-        when(this.productRepository.findProductByProductId((Long) any())).thenReturn(Optional.empty());
-        assertThrows(ProductNotFoundException.class, () -> this.adminService.deleteProduct(123L));
-    }
+//    @Test
+//    void testForAdminToDeleteProduct() {
+//        doThrow(new ProductNotFoundException("Product is not found!")).when(this.productRepository).deleteById((Long) any());
+//        when(this.productRepository.findProductByProductId((Long) any())).thenReturn(Optional.of(product));
+//        assertThrows(ProductNotFoundException.class, () -> this.adminService.deleteProduct(123L));
+//        verify(this.productRepository).findProductByProductId((Long) any());
+//        verify(this.productRepository).deleteById((Long) any());
+//        when(this.productRepository.findProductByProductId((Long) any())).thenReturn(Optional.empty());
+//        assertThrows(ProductNotFoundException.class, () -> this.adminService.deleteProduct(123L));
+//    }
 
     @Test
     void viewParticularOrder() {
